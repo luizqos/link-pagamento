@@ -158,12 +158,28 @@
 
                     if (typeof obj.status != "undefined") {
                         if (obj.status) {
-                            alert(obj.message);
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 5000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            })
+
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Ocorreu um erro, tente novamente'
+                            })
                         } else {
 
                             if (obj.transaction_data.qr_code_base64 == NULL ||
                                 typeof obj.transaction_data.qr_code_base64 == "undefined") {
-                                alert('Error');
+                                    closeModal('dv-modal');
+                                    alert('Error');
                                 return false;
                             }
 
@@ -180,15 +196,15 @@
                     if (obj) {
                         closeModal('dv-modal');
                         Swal.fire({
-                        text: 'Pix copia e cola',
-                        imageUrl: qrCode,
-                        imageWidth: 200,
-                        imageHeight: 200,
-                        imageAlt: 'qrcode',
-                        input: 'textarea',
-                        inputValue: codePix,
-                        confirmButtonColor: '#0d6efd',
-                        confirmButtonText: 'Fechar',
+                            text: 'Pix copia e cola',
+                            imageUrl: qrCode,
+                            imageWidth: 200,
+                            imageHeight: 200,
+                            imageAlt: 'qrcode',
+                            input: 'textarea',
+                            inputValue: codePix,
+                            confirmButtonColor: '#0d6efd',
+                            confirmButtonText: 'Fechar',
                             inputAttributes: {
                                 'aria-label': "codePix"
                             },
@@ -196,8 +212,23 @@
                     }
 
                 } catch (e) {
-                    console.log("erro", e);
-                    alert('error');
+                    closeModal('dv-modal');
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    })
+
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Ocorreu um erro, tente novamente'
+                    })
                 }
             });
         };
