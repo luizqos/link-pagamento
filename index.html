@@ -10,6 +10,7 @@
     <link href="./assets/css/custom.css" rel="stylesheet">
     <link href="./assets/css/index.css" rel="stylesheet">
     <link href="./assets/css/pricing.css" rel="stylesheet">
+    <link href="./assets/css/pix.css" rel="stylesheet">
 </head>
 
 <body>
@@ -55,6 +56,9 @@
                             <ul class="list-unstyled mt-3 mb-4">
                                 <img src="./assets/img/pix.png" width="200px">
                             </ul>
+                            <!-- <button class="btn btn-primary" data-toggle="page-pix" data-target="#dv-modal-pix">
+                                Abrir MODAL
+                                </button> -->
                             <button type="button" onClick="abrirPix()"
                                 class="w-100 btn btn-lg btn-outline-primary">Pagar</button>
                         </div>
@@ -88,13 +92,52 @@
     </div>
 
 
-    <div id="dv-modal" class="modal">
+    <!-- <div id="dv-modal" class="modal">
         <div class="modal-conteudo">
             <div class="modal-body">
                 <img class="loading" src="./assets/img/loading.gif">
             </div>
         </div>
-    </div>
+    </div> -->
+
+    <div id="dv-modal-pix" class="modal">
+        <div class="content-pix">
+            <div class="content-cobranca">
+                <h5>Cobrança</h5>
+                <h6>Valor: R$10,00</h6>
+                <h6>Fatura: 08/2022</h6>
+              </div>
+          <div class="Qrcode-pix">
+            <h1>Pagamento com PIX</h1>
+            <img src="https://www.canalautismo.com.br/wp-content/uploads/2018/05/qrcode-RevistaAutismo.png" />
+          </div>
+          <div class="copia-e-cola">
+            <input disabled value="pixCopia" style="width: 30%; margin: 15px 0;" />
+            <button onClick="">
+              <span style="margin-left: 5px;">Copiar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    
+
+    <!-- <div id="dv-modal-pix" class="modal"></div>
+        <div class="page-pix">
+            <div class="content-pix">
+                <div class="Qrcode-pix">
+                    <h1>Pagamento com PIX</h1>
+                    <img src="https://www.canalautismo.com.br/wp-content/uploads/2018/05/qrcode-RevistaAutismo.png" />
+                </div>
+                <div class="copia-e-cola">
+                    <input disabled value="pixCopia" style="width: 60%; margin: 15px 0;" />
+                    <button onClick="copiar()">
+                        <AiOutlineCopy color="white" size={20} />
+                        <span style="margin-left: 5px;">Copiar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -122,7 +165,7 @@
         }
 
         function abrirPix() {
-            openModal('dv-modal');
+            openModal('dv-modal-pix');
 
             // setTimeout(() => {
 
@@ -151,85 +194,85 @@
 
             // }, "3000")
 
-            $.post('payment.php', { pix: true }, function (response) {
+            // $.post('payment.php', { pix: true }, function (response) {
 
-                try {
-                    let obj = JSON.parse(response);
+            //     try {
+            //         let obj = JSON.parse(response);
 
-                    if (typeof obj.status != "undefined") {
-                        if (obj.status) {
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 5000,
-                                timerProgressBar: true,
-                                didOpen: (toast) => {
-                                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                                }
-                            })
+            //         if (typeof obj.status != "undefined") {
+            //             if (obj.status) {
+            //                 const Toast = Swal.mixin({
+            //                     toast: true,
+            //                     position: 'top-end',
+            //                     showConfirmButton: false,
+            //                     timer: 5000,
+            //                     timerProgressBar: true,
+            //                     didOpen: (toast) => {
+            //                         toast.addEventListener('mouseenter', Swal.stopTimer)
+            //                         toast.addEventListener('mouseleave', Swal.resumeTimer)
+            //                     }
+            //                 })
 
-                            Toast.fire({
-                                icon: 'error',
-                                title: 'Ocorreu um erro, tente novamente'
-                            })
-                        } else {
+            //                 Toast.fire({
+            //                     icon: 'error',
+            //                     title: 'Ocorreu um erro, tente novamente'
+            //                 })
+            //             } else {
 
-                            if (obj.transaction_data.qr_code_base64 == NULL ||
-                                typeof obj.transaction_data.qr_code_base64 == "undefined") {
-                                    closeModal('dv-modal');
-                                return false;
-                            }
+            //                 if (obj.transaction_data.qr_code_base64 == NULL ||
+            //                     typeof obj.transaction_data.qr_code_base64 == "undefined") {
+            //                         closeModal('dv-modal-pix');
+            //                     return false;
+            //                 }
 
-                        }
-                    }
-                    let base64 = obj.transaction_data.qr_code_base64;
-                    let codePix = obj.transaction_data.qr_code;
+            //             }
+            //         }
+            //         let base64 = obj.transaction_data.qr_code_base64;
+            //         let codePix = obj.transaction_data.qr_code;
 
-                    let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
+            //         let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
 
-                    console.log("qr", qrCode);
-                    console.log("qr", codePix);
+            //         console.log("qr", qrCode);
+            //         console.log("qr", codePix);
 
-                    if (obj) {
-                        closeModal('dv-modal');
-                        Swal.fire({
-                            text: 'Pix copia e cola',
-                            imageUrl: qrCode,
-                            imageWidth: 200,
-                            imageHeight: 200,
-                            imageAlt: 'qrcode',
-                            input: 'textarea',
-                            inputValue: codePix,
-                            confirmButtonColor: '#0d6efd',
-                            confirmButtonText: 'Fechar',
-                            inputAttributes: {
-                                'aria-label': "codePix"
-                            },
-                        })
-                    }
+            //         if (obj) {
+            //             closeModal('dv-modal-pix');
+            //             Swal.fire({
+            //                 text: 'Pix copia e cola',
+            //                 imageUrl: qrCode,
+            //                 imageWidth: 200,
+            //                 imageHeight: 200,
+            //                 imageAlt: 'qrcode',
+            //                 input: 'textarea',
+            //                 inputValue: codePix,
+            //                 confirmButtonColor: '#0d6efd',
+            //                 confirmButtonText: 'Fechar',
+            //                 inputAttributes: {
+            //                     'aria-label': "codePix"
+            //                 },
+            //             })
+            //         }
 
-                } catch (e) {
-                    closeModal('dv-modal');
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 5000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                        }
-                    })
+            //     } catch (e) {
+            //         closeModal('dv-modal-pix');
+            //         const Toast = Swal.mixin({
+            //             toast: true,
+            //             position: 'top-end',
+            //             showConfirmButton: false,
+            //             timer: 5000,
+            //             timerProgressBar: true,
+            //             didOpen: (toast) => {
+            //                 toast.addEventListener('mouseenter', Swal.stopTimer)
+            //                 toast.addEventListener('mouseleave', Swal.resumeTimer)
+            //             }
+            //         })
 
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Ocorreu um erro, tente novamente'
-                    })
-                }
-            });
+            //         Toast.fire({
+            //             icon: 'error',
+            //             title: 'Ocorreu um erro, tente novamente'
+            //         })
+            //     }
+            // });
         };
     </script>
 </body>
