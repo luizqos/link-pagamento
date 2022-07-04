@@ -48,6 +48,10 @@
   .content-cobranca {
     margin-top: 20%;
   }
+  .Qrcode-pix{
+    width: 85%;
+    height: 85%;
+  }
 }
 
 /* min-width */
@@ -55,6 +59,10 @@
   .content-pix,
   .content-cobranca {
     margin-top: 15%;
+  }
+  .Qrcode-pix{
+    width: 350px;
+    height: 350px;
   }
 }
 
@@ -64,6 +72,10 @@
   .content-cobranca {
     margin-top: 20%;
   }
+  .Qrcode-pix{
+    width: 350px;
+    height: 350px;
+  }
 }
 
 /* max device width */
@@ -71,6 +83,10 @@
   .content-pix,
   .content-cobranca {
     margin-top: 30%;
+  }
+  .Qrcode-pix{
+    width: 85%;
+    height: 85%;
   }
 }
 
@@ -96,8 +112,6 @@
 }
 
 .Qrcode-pix{
-  width: 200px;
-  height: 200px;
   background-color: #F4F4F4;
   border-radius: 10px;
   color: #FFFFFF;
