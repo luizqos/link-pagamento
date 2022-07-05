@@ -39,7 +39,7 @@ function string_between_two_string($str, $starting_word, $ending_word)
         , c.estado
         , DATE_ADD(pp.dataCreated, INTERVAL 1 DAY) as validadePix
         from pagamentos_pix as pp
-        inner join lancamentos as L
+        inner join lancamentos as l
         on pp.idVenda = l.vendas_id
         inner join clientes as c
         on l.clientes_id = c.idClientes
