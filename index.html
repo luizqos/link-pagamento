@@ -11,6 +11,7 @@
     <link href="./assets/css/index.css" rel="stylesheet">
     <link href="./assets/css/pricing.css" rel="stylesheet">
     <link href="./assets/css/pix.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
 </head>
 
 <body>
@@ -102,6 +103,7 @@
 
     <div id="dv-modal-pix" class="modal">
         <div class="content-pix">
+            <img class="btn-sair" onClick="closeModal('dv-modal-pix')" src="./assets/img/exit.png">
             <div class="content-cobranca">
                 <h5>Cobrança</h5>
                 <h6  id="valor">Valor:</h6 >
@@ -113,9 +115,10 @@
             </div>
             <div class="copia-e-cola">
                 <input id="codePix" disabled value="pixCopia" style="width: 30%; margin: 15px 0;" />
-                <button onClick="">
+                <button class="btn-copia" onClick="copiar()">
                     <span style="margin-left: 5px;">Copiar</span>
                 </button>
+
             </div>
         </div>
     </div>
@@ -143,10 +146,8 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-
-    <script type="text/javascript" src="./assets/js/pix.js">
-      
-    </script>
+    <script type="text/javascript" src="./assets/js/pix.js"></script>
+    <script type="text/javascript" src="./assets/js/copiar.js"></script>
 </body>
 
 </html>
