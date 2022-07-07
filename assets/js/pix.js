@@ -18,7 +18,14 @@ function closeModal(mn) {
     document.body.style.overflow = 'auto';
 }
 
+function buscaValor() {
+    openModal('dv-modal-cpf');
+}
 function abrirPix() {
+    let cpf = document.getElementById("cpf").value;
+    console.log("cpf>>>", cpf);
+    closeModal('dv-modal-cpf');
+   
     openModal('loading');
 
         // let codePix = "00020126360014br.gov.bcb.pix0114+5531971307090520400005303986540510.005802BR5912FAROESTE20056014Belo Horizonte62240520mpqrinter2361507202663048183";
