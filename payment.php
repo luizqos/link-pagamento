@@ -16,16 +16,6 @@ function string_between_two_string($str, $starting_word, $ending_word)
     // Return the substring from the index substring_start of length size 
     return substr($str, $subtring_start, $size);  
 }
-$tiraacento = array(
-  'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj',''=>'Z', ''=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A',
-  'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I',
-  'Ï'=>'I', 'Ñ'=>'N', 'Ń'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U',
-  'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss','à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a',
-  'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i',
-  'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ń'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u',
-  'ú'=>'u', 'û'=>'u', 'ü'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y', 'ƒ'=>'f',
-  'ă'=>'a', 'î'=>'i', 'â'=>'a', 'ș'=>'s', 'ț'=>'t', 'Ă'=>'A', 'Î'=>'I', 'Â'=>'A', 'Ș'=>'S', 'Ț'=>'T',
-);
 
 $cpf  = $_GET['doc'];
 
@@ -60,12 +50,15 @@ $cpf  = $_GET['doc'];
         on l.clientes_id = c.idClientes
         where c.documento = '$cpf'
         and l.baixado = 0
-        order by l.data_vencimento asc
+        order by l.data_vencimento desc
         LIMIT 1";
 
         $result = mysqli_query($conexao,$query);
 
         foreach($result as $r) {
+            date_default_timezone_set('America/Fortaleza');
+            $dataAtual = date('Y-m-d H:i:s');
+
             $id = $r['id'];
             $idVenda = $r['idVenda'];
             $codePix = $r['codePix'];
@@ -80,10 +73,14 @@ $cpf  = $_GET['doc'];
             $bairro = $r['bairro'];
             $cidade = $r['cidade'];
             $uf = $r['estado'];
-            $validadePix = $r['validadePix'];
+            $validadePix = date('Y-m-d H:i:s', strtotime($r['validadePix'])); 
             $ref = string_between_two_string($r['descricao'], 'Ref: ', ' N');
             $descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
-
+              if( $validadePix == null || $validadePix < $dataAtual){
+                $gravaPix = 'S';
+              }else{
+                $gravaPix = 'N';
+              }
           }
         mysqli_close($conexao);
 
@@ -115,17 +112,27 @@ $cpf  = $_GET['doc'];
 
   				$payment->save();
 
-        //echo json_encode($payment->point_of_interaction);
-        
+          if($gravaPix == 'S'){
+            $qr_code =  $payment->point_of_interaction->transaction_data->qr_code;
+            $qr_code_base64 =  'data:image/jpeg;base64,' . $payment->point_of_interaction->transaction_data->qr_code_base64;
 
-        echo json_encode(
+            $conexao = mysqli_connect($servidor, $usuario, $senha, $dbname);
+            
+            $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`) VALUES ($idVenda, '$qr_code', '$qr_code_base64')";
+
+            mysqli_query($conexao,$sql);
+
+            mysqli_close($conexao);
+          }
+
+          echo json_encode(
         array(
           'pix'  => $payment->point_of_interaction,
           'dados'=>  array(
           'idVenda'  => $idVenda,
           'valor' => $valor,
           'ref' => $ref,
-          'bairro' => $bairro
+          'gerapix' => $gravaPix
           )
         ));
 

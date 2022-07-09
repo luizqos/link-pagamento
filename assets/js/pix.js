@@ -23,7 +23,7 @@ function buscaValor() {
 }
 function abrirPix() {
     let cpf = document.getElementById("cpf").value;
-    console.log("cpf>>", cpf);
+
     closeModal('dv-modal-cpf');
 
     openModal('loading');
@@ -68,7 +68,7 @@ function abrirPix() {
 
             // console.log("qr", qrCode);
             // console.log("qr", codePix);
-            console.log("retorno>>>",obj.dados.ref);
+            //console.log("retorno>>>",obj);
 
             if (obj) {
                 let valorParcela = Number(obj.dados.valor);
@@ -101,7 +101,7 @@ function abrirPix() {
             console.log("erro/... ", e);
             Toast.fire({
                 icon: 'error',
-                title: 'Ocorreu um erro, tente novamente....'
+                title: 'Ocorreu um erro, tente novamente.'
             })
         }
     });
