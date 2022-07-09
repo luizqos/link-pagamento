@@ -75,7 +75,8 @@ $cpf  = $_GET['doc'];
             $uf = $r['estado'];
             $validadePix = date('Y-m-d H:i:s', strtotime($r['validadePix'])); 
             $ref = string_between_two_string($r['descricao'], 'Ref: ', ' N');
-            $descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
+            $descricao = $r['descricao'];
+            //$descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
               if( $validadePix == null || $validadePix < $dataAtual){
                 $gravaPix = 'S';
               }else{
