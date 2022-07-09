@@ -1,5 +1,8 @@
 <?php
-    include_once 'conexao.php';
+// header("Content-type: application/json; charset=iso-8859-1");
+// header('Content-type: text/html; charset=utf-8');
+
+include_once 'conexao.php';
 
     
 function string_between_two_string($str, $starting_word, $ending_word)
@@ -13,7 +16,19 @@ function string_between_two_string($str, $starting_word, $ending_word)
     // Return the substring from the index substring_start of length size 
     return substr($str, $subtring_start, $size);  
 }
-  
+$tiraacento = array(
+  'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj',''=>'Z', ''=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A',
+  'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I',
+  'Ï'=>'I', 'Ñ'=>'N', 'Ń'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U',
+  'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss','à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a',
+  'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i',
+  'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ń'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u',
+  'ú'=>'u', 'û'=>'u', 'ü'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y', 'ƒ'=>'f',
+  'ă'=>'a', 'î'=>'i', 'â'=>'a', 'ș'=>'s', 'ț'=>'t', 'Ă'=>'A', 'Î'=>'I', 'Â'=>'A', 'Ș'=>'S', 'Ț'=>'T',
+);
+
+$cpf  = $_GET['doc'];
+
   if(isset($_POST)){
 
     if(isset($_POST['pix'])){
@@ -21,7 +36,7 @@ function string_between_two_string($str, $starting_word, $ending_word)
       if($_POST['pix']){
 
         $query = "select  pp.id 
-        , pp.idVenda
+        , if(pp.idVenda is null, l.vendas_id, pp.idVenda) as idVenda
         , pp.codePix
         , pp.qrCode
         , pp.dataCreated
@@ -38,14 +53,14 @@ function string_between_two_string($str, $starting_word, $ending_word)
         , c.cidade
         , c.estado
         , DATE_ADD(pp.dataCreated, INTERVAL 1 DAY) as validadePix
-        from pagamentos_pix as pp
-        inner join lancamentos as l
+		from lancamentos as l
+        left join pagamentos_pix as pp
         on pp.idVenda = l.vendas_id
         inner join clientes as c
         on l.clientes_id = c.idClientes
-        where l.vendas_id = 30
+        where c.documento = '$cpf'
         and l.baixado = 0
-        order by pp.id desc
+        order by l.data_vencimento asc
         LIMIT 1";
 
         $result = mysqli_query($conexao,$query);
@@ -68,7 +83,8 @@ function string_between_two_string($str, $starting_word, $ending_word)
             $validadePix = $r['validadePix'];
             $ref = string_between_two_string($r['descricao'], 'Ref: ', ' N');
             $descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
-        }
+
+          }
         mysqli_close($conexao);
 
         require_once 'mercadopago/lib/mercadopago/vendor/autoload.php';
@@ -108,7 +124,8 @@ function string_between_two_string($str, $starting_word, $ending_word)
           'dados'=>  array(
           'idVenda'  => $idVenda,
           'valor' => $valor,
-          'ref' => $ref
+          'ref' => $ref,
+          'bairro' => $bairro
           )
         ));
 
