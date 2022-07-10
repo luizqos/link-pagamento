@@ -66,8 +66,6 @@ function abrirPix() {
 
             let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
 
-            // console.log("qr", qrCode);
-            // console.log("qr", codePix);
             //console.log("retorno>>>",obj);
 
             if (obj) {
@@ -77,7 +75,8 @@ function abrirPix() {
                 fatura = `Fatura: ${fatura}`;
         
                 document.getElementById("qrCode").setAttribute('src', qrCode);
-                document.getElementById("codePix").setAttribute('value',codePix);
+                //document.getElementById("codePix").setAttribute('value',codePix);
+                document.getElementById("codePix").innerText = codePix;
                 document.getElementById("valor").innerText = valorParcela;
                 document.getElementById("fatura").innerText = fatura;
                 closeModal('loading');
@@ -98,7 +97,6 @@ function abrirPix() {
                     toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             })
-            console.log("erro/... ", e);
             Toast.fire({
                 icon: 'error',
                 title: 'Ocorreu um erro, tente novamente.'
