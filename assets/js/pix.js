@@ -75,7 +75,8 @@ function abrirPix() {
                 fatura = `Fatura: ${fatura}`;
         
                 document.getElementById("qrCode").setAttribute('src', qrCode);
-                document.getElementById("codePix").setAttribute('value',codePix);
+                //document.getElementById("codePix").setAttribute('value',codePix);
+                document.getElementById("codePix").innerText = codePix;
                 document.getElementById("valor").innerText = valorParcela;
                 document.getElementById("fatura").innerText = fatura;
                 closeModal('loading');
