@@ -70,6 +70,9 @@ function abrirPix() {
             try {
 
                 let obj = JSON.parse(response);
+
+                console.log('Obj>>', obj);
+
                 if (typeof obj.pix.status != "undefined") {
                     if (obj.pix.status) {
                         const Toast = Swal.mixin({
@@ -99,12 +102,13 @@ function abrirPix() {
 
                     }
                 }
-                let base64 = obj.pix.transaction_data.qr_code_base64;
-                let codePix = obj.pix.transaction_data.qr_code;
+
+                let base64 = (obj.pix.transaction_data.qr_code_base64 === true) ? obj.pix.transaction_data.qr_code_base64 : obj.dados.qr_code_base64;
+                //let base64 = obj.pix.transaction_data.qr_code_base64;
+                //let codePix = obj.pix.transaction_data.qr_code;
+                let codePix = (obj.pix.transaction_data.qr_code === true) ? obj.pix.transaction_data.qr_code : obj.dados.qr_code;
 
                 let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
-
-                //console.log("retorno>>>",obj);
 
                 if (obj) {
                     let valorParcela = Number(obj.dados.valor);
@@ -122,6 +126,7 @@ function abrirPix() {
                 }
 
             } catch (e) {
+                console.log("erro>>>", e);
                 closeModal('loading');
                 closeModal('dv-modal-pix');
                 const Toast = Swal.mixin({

@@ -50,7 +50,7 @@ $cpf  = $_GET['doc'];
         on l.clientes_id = c.idClientes
         where c.documento = '$cpf'
         and l.baixado = 0
-        order by l.data_vencimento desc
+        order by l.data_vencimento asc
         LIMIT 1";
 
         $result = mysqli_query($conexao,$query);
@@ -111,9 +111,11 @@ $cpf  = $_GET['doc'];
   					)
   				);
 
-  				$payment->save();
-
+  				
           if($gravaPix == 'S'){
+
+            $payment->save();
+
             $qr_code =  $payment->point_of_interaction->transaction_data->qr_code;
             $qr_code_base64 =  'data:image/jpeg;base64,' . $payment->point_of_interaction->transaction_data->qr_code_base64;
 
@@ -124,39 +126,55 @@ $cpf  = $_GET['doc'];
             mysqli_query($conexao,$sql);
 
             mysqli_close($conexao);
+
+            echo json_encode(
+              array(
+                'pix'  => $payment->point_of_interaction,
+                'dados'=>  array(
+                'idVenda'  => $idVenda,
+                'valor' => $valor,
+                'ref' => $ref,
+                'validoAt' => $validadePix,
+                'gerapix' => $gravaPix
+                )
+              ));
+      
+            }else{
+              echo json_encode(array(
+                'status'  => 'error',
+                'message' => 'pix required'
+              ));
+              exit;
+            }
+      
+          }else{
+            echo json_encode(array(
+              'status'  => 'error',
+              'message' => 'pix required'
+            ));
+            exit;
           }
-
-          echo json_encode(
-        array(
-          'pix'  => $payment->point_of_interaction,
-          'dados'=>  array(
-          'idVenda'  => $idVenda,
-          'valor' => $valor,
-          'ref' => $ref,
-          'gerapix' => $gravaPix
-          )
-        ));
-
-      }else{
-        echo json_encode(array(
-          'status'  => 'error',
-          'message' => 'pix required'
-        ));
-        exit;
-      }
-
-    }else{
-      echo json_encode(array(
-        'status'  => 'error',
-        'message' => 'pix required'
-      ));
-      exit;
-    }
-
-  }else{
-    echo json_encode(array(
-      'status'  => 'error',
-      'message' => 'post required'
-    ));
-    exit;
-  }
+      
+        }else{
+          echo json_encode(array(
+            'status'  => 'error',
+            'message' => 'post required'
+          ));
+          exit;
+        }
+          } else {            
+            
+            echo json_encode(
+            array(
+              'dados'=>  array(
+              'qr_code_base64' => $qrCode,
+              'qr_code' => $codePix,
+              'idVenda'  => $idVenda,
+              'valor' => $valor,
+              'validoAt' => $validadePix,
+              'ref' => $ref,
+              'gerapix' => $gravaPix
+              )
+              ));
+          }
+?>
