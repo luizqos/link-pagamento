@@ -1,8 +1,5 @@
 <?php
-// header("Content-type: application/json; charset=iso-8859-1");
-// header('Content-type: text/html; charset=utf-8');
-
-include_once 'conexao.php';
+    include_once 'conexao.php';
 
     
 function string_between_two_string($str, $starting_word, $ending_word)
@@ -16,9 +13,7 @@ function string_between_two_string($str, $starting_word, $ending_word)
     // Return the substring from the index substring_start of length size 
     return substr($str, $subtring_start, $size);  
 }
-
-$cpf  = $_GET['doc'];
-
+  
   if(isset($_POST)){
 
     if(isset($_POST['pix'])){
@@ -43,6 +38,7 @@ $cpf  = $_GET['doc'];
         , c.cidade
         , c.estado
         , DATE_ADD(pp.dataCreated, INTERVAL 1 DAY) as validadePix
+        , IF(DATE_ADD(pp.dataCreated, INTERVAL 1 DAY) > NOW(), 'S', 'N') AS pixValido
 		from lancamentos as l
         left join pagamentos_pix as pp
         on pp.idVenda = l.vendas_id
@@ -50,15 +46,12 @@ $cpf  = $_GET['doc'];
         on l.clientes_id = c.idClientes
         where c.documento = '$cpf'
         and l.baixado = 0
-        order by l.data_vencimento asc
+        order by l.data_vencimento asc, pp.dataCreated desc
         LIMIT 1";
 
         $result = mysqli_query($conexao,$query);
 
         foreach($result as $r) {
-            date_default_timezone_set('America/Fortaleza');
-            $dataAtual = date('Y-m-d H:i:s');
-
             $id = $r['id'];
             $idVenda = $r['idVenda'];
             $codePix = $r['codePix'];
@@ -73,16 +66,10 @@ $cpf  = $_GET['doc'];
             $bairro = $r['bairro'];
             $cidade = $r['cidade'];
             $uf = $r['estado'];
-            $validadePix = date('Y-m-d H:i:s', strtotime($r['validadePix'])); 
+            $validadePix = $r['validadePix'];
             $ref = string_between_two_string($r['descricao'], 'Ref: ', ' N');
-            $descricao = $r['descricao'];
-            //$descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
-              if( $validadePix == null || $validadePix < $dataAtual){
-                $gravaPix = 'S';
-              }else{
-                $gravaPix = 'N';
-              }
-          }
+            $descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
+        }
         mysqli_close($conexao);
 
         require_once 'mercadopago/lib/mercadopago/vendor/autoload.php';
@@ -111,70 +98,41 @@ $cpf  = $_GET['doc'];
   					)
   				);
 
-  				
-          if($gravaPix == 'S'){
+  				$payment->save();
 
-            $payment->save();
+        //echo json_encode($payment->point_of_interaction);
+        
 
-            $qr_code =  $payment->point_of_interaction->transaction_data->qr_code;
-            $qr_code_base64 =  'data:image/jpeg;base64,' . $payment->point_of_interaction->transaction_data->qr_code_base64;
+        echo json_encode(
+        array(
+          'pix'  => $payment->point_of_interaction,
+          'dados'=>  array(
+          'idVenda'  => $idVenda,
+          'valor' => $valor,
+          'ref' => $ref
+          )
+        ));
 
-            $conexao = mysqli_connect($servidor, $usuario, $senha, $dbname);
-            
-            $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`) VALUES ($idVenda, '$qr_code', '$qr_code_base64')";
+      }else{
+        echo json_encode(array(
+          'status'  => 'error',
+          'message' => 'pix required'
+        ));
+        exit;
+      }
 
-            mysqli_query($conexao,$sql);
+    }else{
+      echo json_encode(array(
+        'status'  => 'error',
+        'message' => 'pix required'
+      ));
+      exit;
+    }
 
-            mysqli_close($conexao);
-
-            echo json_encode(
-              array(
-                'pix'  => $payment->point_of_interaction,
-                'dados'=>  array(
-                'idVenda'  => $idVenda,
-                'valor' => $valor,
-                'ref' => $ref,
-                'validoAt' => $validadePix,
-                'gerapix' => $gravaPix
-                )
-              ));
-      
-            }else{
-              echo json_encode(array(
-                'status'  => 'error',
-                'message' => 'pix required'
-              ));
-              exit;
-            }
-      
-          }else{
-            echo json_encode(array(
-              'status'  => 'error',
-              'message' => 'pix required'
-            ));
-            exit;
-          }
-      
-        }else{
-          echo json_encode(array(
-            'status'  => 'error',
-            'message' => 'post required'
-          ));
-          exit;
-        }
-          } else {            
-            
-            echo json_encode(
-            array(
-              'dados'=>  array(
-              'qr_code_base64' => $qrCode,
-              'qr_code' => $codePix,
-              'idVenda'  => $idVenda,
-              'valor' => $valor,
-              'validoAt' => $validadePix,
-              'ref' => $ref,
-              'gerapix' => $gravaPix
-              )
-              ));
-          }
-?>
+  }else{
+    echo json_encode(array(
+      'status'  => 'error',
+      'message' => 'post required'
+    ));
+    exit;
+  }
