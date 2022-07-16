@@ -43,6 +43,7 @@ $cpf  = $_GET['doc'];
         , c.cidade
         , c.estado
         , DATE_ADD(pp.dataCreated, INTERVAL 1 DAY) as validadePix
+        , IF(DATE_ADD(pp.dataCreated, INTERVAL 1 DAY) > NOW(), 'S', 'N') AS pixValido
 		from lancamentos as l
         left join pagamentos_pix as pp
         on pp.idVenda = l.vendas_id
@@ -50,7 +51,7 @@ $cpf  = $_GET['doc'];
         on l.clientes_id = c.idClientes
         where c.documento = '$cpf'
         and l.baixado = 0
-        order by l.data_vencimento desc
+        order by l.data_vencimento asc, pp.dataCreated desc
         LIMIT 1";
 
         $result = mysqli_query($conexao,$query);
@@ -77,86 +78,92 @@ $cpf  = $_GET['doc'];
             $ref = string_between_two_string($r['descricao'], 'Ref: ', ' N');
             $descricao = $r['descricao'];
             //$descricao = 'Lista Iptv | Ref:'.$ref.' | Venda: '. $idVenda;
-              if( $validadePix == null || $validadePix < $dataAtual){
-                $gravaPix = 'S';
-              }else{
-                $gravaPix = 'N';
-              }
+            if($r['pixValido'] == 'N'){
+              $gravaPix = 'S';
+            }else{
+              $gravaPix = 'N';
+            }
           }
         mysqli_close($conexao);
+        
+        if($idVenda){
+            if($gravaPix == 'S'){
 
-        require_once 'mercadopago/lib/mercadopago/vendor/autoload.php';
+              require_once 'mercadopago/lib/mercadopago/vendor/autoload.php';
 
-        MercadoPago\SDK::setAccessToken($access_token);
+              MercadoPago\SDK::setAccessToken($access_token);
+      
+      
+              $payment = new MercadoPago\Payment();
+              $payment->description = $descricao;
+              $payment->transaction_amount = (double)$valor;
+              $payment->payment_method_id = "pix";
+      
+              $payment->notification_url  = 'https://seusite.com/notification.php';
+              $payment->external_reference = $idVenda;
+      
+                $payment->payer = array(
+                  "email" => $email,
+                  "first_name" => $nomeCliente,
+                  "address"=>  array(
+                    "zip_code" => $cep,
+                    "street_name" => $rua,
+                    "street_number" => $numero,
+                    "neighborhood" => $bairro,
+                    "city" => $cidade,
+                    "federal_unit" => $uf
+                  )
+                );
+      
 
+              $payment->save();
 
-  			$payment = new MercadoPago\Payment();
-  			$payment->description = $descricao;
-  			$payment->transaction_amount = (double)$valor;
-  			$payment->payment_method_id = "pix";
+              $qr_code = $payment->point_of_interaction->transaction_data->qr_code;
+              $qr_code_base64 = $payment->point_of_interaction->transaction_data->qr_code_base64;
 
-  			$payment->notification_url  = 'https://seusite.com/notification.php';
-  			$payment->external_reference = $idVenda;
+              $conexao = mysqli_connect($servidor, $usuario, $senha, $dbname);
+              
+              $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`) VALUES ($idVenda, '$qr_code', '$qr_code_base64')";
 
-  				$payment->payer = array(
-  					"email" => $email,
-  					"first_name" => $nomeCliente,
-  					"address"=>  array(
-  						"zip_code" => $cep,
-  						"street_name" => $rua,
-  						"street_number" => $numero,
-  						"neighborhood" => $bairro,
-  						"city" => $cidade,
-  						"federal_unit" => $uf
-  					)
-  				);
+              mysqli_query($conexao,$sql);
 
-  				$payment->save();
+              mysqli_close($conexao);
 
-          if($gravaPix == 'S'){
-            $qr_code =  $payment->point_of_interaction->transaction_data->qr_code;
-            $qr_code_base64 =  'data:image/jpeg;base64,' . $payment->point_of_interaction->transaction_data->qr_code_base64;
-
-            $conexao = mysqli_connect($servidor, $usuario, $senha, $dbname);
-            
-            $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`) VALUES ($idVenda, '$qr_code', '$qr_code_base64')";
-
-            mysqli_query($conexao,$sql);
-
-            mysqli_close($conexao);
+              echo json_encode(
+                array(
+                  'pix'  => $payment->point_of_interaction,
+                  'dados'=>  array(
+                  'idVenda'  => $idVenda,
+                  'valor' => $valor,
+                  'ref' => $ref,
+                  'validoAt' => $validadePix,
+                  'gerapix' => $gravaPix
+                  )
+                ));
+        
+              }else {            
+              echo json_encode(
+                array(
+                  'dados'=>  array(
+                  'qr_code_base64' => $qrCode,
+                  'qr_code' => $codePix,
+                  'idVenda'  => $idVenda,
+                  'valor' => $valor,
+                  'validoAt' => $validadePix,
+                  'ref' => $ref,
+                  'gerapix' => $gravaPix
+                  )
+                  ));
+              }
+          }else{
+            echo json_encode(array(
+              'status'  => 'info',
+              'message' => 'Não encontrei débitos para seu CPF'
+            ));
           }
-
-          echo json_encode(
-        array(
-          'pix'  => $payment->point_of_interaction,
-          'dados'=>  array(
-          'idVenda'  => $idVenda,
-          'valor' => $valor,
-          'ref' => $ref,
-          'gerapix' => $gravaPix
-          )
-        ));
-
-      }else{
-        echo json_encode(array(
-          'status'  => 'error',
-          'message' => 'pix required'
-        ));
-        exit;
-      }
-
-    }else{
-      echo json_encode(array(
-        'status'  => 'error',
-        'message' => 'pix required'
-      ));
-      exit;
-    }
-
-  }else{
-    echo json_encode(array(
-      'status'  => 'error',
-      'message' => 'post required'
-    ));
-    exit;
-  }
+      
+            }
+      
+          }
+      } 
+?>
