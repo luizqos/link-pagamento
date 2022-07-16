@@ -70,58 +70,84 @@ function abrirPix() {
             try {
 
                 let obj = JSON.parse(response);
-                if (typeof obj.pix.status != "undefined") {
-                    if (obj.pix.status) {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 5000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.addEventListener('mouseenter', Swal.stopTimer)
-                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+
+                console.log('Obj>>', obj.length);
+
+                if(obj.dados.gerapix == 'S'){
+                    if (typeof obj.pix.status != "undefined") {
+                        if (obj.pix.status) {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 5000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            })
+
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Ocorreu um erro, tente novamente!'
+                            })
+                        } else {
+
+                            if (obj.pix.transaction_data.qr_code_base64 == NULL ||
+                                typeof obj.pix.transaction_data.qr_code_base64 == "undefined") {
+                                closeModal('loading');
+                                closeModal('dv-modal-pix');
+                                return false;
                             }
-                        })
 
-                        Toast.fire({
-                            icon: 'error',
-                            title: 'Ocorreu um erro, tente novamente!'
-                        })
-                    } else {
-
-                        if (obj.pix.transaction_data.qr_code_base64 == NULL ||
-                            typeof obj.pix.transaction_data.qr_code_base64 == "undefined") {
-                            closeModal('loading');
-                            closeModal('dv-modal-pix');
-                            return false;
                         }
+                    }
+                    let base64 = obj.pix.transaction_data.qr_code_base64;
+                    let codePix = obj.pix.transaction_data.qr_code;
+                    let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
 
+                    if (obj) {
+                        let valorParcela = Number(obj.dados.valor);
+                        valorParcela = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
+                        let fatura = obj.dados.ref;
+                        fatura = `Fatura: ${fatura}`;
+    
+                        document.getElementById("qrCode").setAttribute('src', qrCode);
+                        //document.getElementById("codePix").setAttribute('value',codePix);
+                        document.getElementById("codePix").innerText = codePix;
+                        document.getElementById("valor").innerText = valorParcela;
+                        document.getElementById("fatura").innerText = fatura;
+                        closeModal('loading');
+                        openModal('dv-modal-pix');
+                    }
+    
+
+                }else{
+                    
+                    let base64 = obj.dados.qr_code_base64;
+                    
+                    let codePix =  obj.dados.qr_code;
+
+                    let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
+
+                    if (obj) {
+                        let valorParcela = Number(obj.dados.valor);
+                        valorParcela = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
+                        let fatura = obj.dados.ref;
+                        fatura = `Fatura: ${fatura}`;
+
+                        document.getElementById("qrCode").setAttribute('src', qrCode);
+                        //document.getElementById("codePix").setAttribute('value',codePix);
+                        document.getElementById("codePix").innerText = codePix;
+                        document.getElementById("valor").innerText = valorParcela;
+                        document.getElementById("fatura").innerText = fatura;
+                        closeModal('loading');
+                        openModal('dv-modal-pix');
                     }
                 }
-                let base64 = obj.pix.transaction_data.qr_code_base64;
-                let codePix = obj.pix.transaction_data.qr_code;
-
-                let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
-
-                //console.log("retorno>>>",obj);
-
-                if (obj) {
-                    let valorParcela = Number(obj.dados.valor);
-                    valorParcela = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
-                    let fatura = obj.dados.ref;
-                    fatura = `Fatura: ${fatura}`;
-
-                    document.getElementById("qrCode").setAttribute('src', qrCode);
-                    //document.getElementById("codePix").setAttribute('value',codePix);
-                    document.getElementById("codePix").innerText = codePix;
-                    document.getElementById("valor").innerText = valorParcela;
-                    document.getElementById("fatura").innerText = fatura;
-                    closeModal('loading');
-                    openModal('dv-modal-pix');
-                }
-
             } catch (e) {
+                console.log("erro>>>", e);
                 closeModal('loading');
                 closeModal('dv-modal-pix');
                 const Toast = Swal.mixin({
@@ -136,8 +162,8 @@ function abrirPix() {
                     }
                 })
                 Toast.fire({
-                    icon: 'error',
-                    title: 'Ocorreu um erro, tente novamente.'
+                    icon: 'info',
+                    title: 'Não identificamos débitos pendentes para este CPF'
                 })
             }
         });
