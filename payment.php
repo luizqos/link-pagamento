@@ -1,7 +1,7 @@
 <?php
 // header("Content-type: application/json; charset=iso-8859-1");
 // header('Content-type: text/html; charset=utf-8');
-
+date_default_timezone_set('America/Sao_Paulo');
 include_once 'conexao.php';
 
     
@@ -57,7 +57,7 @@ $cpf  = $_GET['doc'];
         $result = mysqli_query($conexao,$query);
 
         foreach($result as $r) {
-            date_default_timezone_set('America/Fortaleza');
+            date_default_timezone_set('America/Sao_Paulo');
             $dataAtual = date('Y-m-d H:i:s');
 
             $id = $r['id'];
@@ -121,13 +121,17 @@ $cpf  = $_GET['doc'];
               $qr_code = $payment->point_of_interaction->transaction_data->qr_code;
               $qr_code_base64 = $payment->point_of_interaction->transaction_data->qr_code_base64;
 
+              $createPix = date('Y-m-d H:i:s');
+              $validadePix = date($createPix, strtotime('+1days'));
+
               $conexao = mysqli_connect($servidor, $usuario, $senha, $dbname);
               
-              $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`) VALUES ($idVenda, '$qr_code', '$qr_code_base64')";
+              $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`, `dataCreated`) VALUES ($idVenda, '$qr_code', '$qr_code_base64', '$createPix')";
 
               mysqli_query($conexao,$sql);
 
               mysqli_close($conexao);
+
 
               echo json_encode(
                 array(

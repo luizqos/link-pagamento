@@ -55,6 +55,11 @@ function validarCPF(cpf) {
     return true;
 }
 
+function convertData(data){
+    let n = new Date(data);
+    return (n.toLocaleString("pt-BR"));
+}
+
 function buscaValor() {
     openModal('dv-modal-cpf');
 }
@@ -71,7 +76,7 @@ function abrirPix() {
 
                 let obj = JSON.parse(response);
 
-                console.log('Obj>>', obj.length);
+                console.log('Obj>>', obj);
 
                 if(obj.dados.gerapix == 'S'){
                     if (typeof obj.pix.status != "undefined") {
@@ -104,8 +109,13 @@ function abrirPix() {
                         }
                     }
                     let base64 = obj.pix.transaction_data.qr_code_base64;
+
                     let codePix = obj.pix.transaction_data.qr_code;
+
                     let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
+                    
+                    let validadePix = convertData(obj.dados.validoAt);
+                    console.log("validadepix", validadePix);
 
                     if (obj) {
                         let valorParcela = Number(obj.dados.valor);
@@ -118,6 +128,7 @@ function abrirPix() {
                         document.getElementById("codePix").innerText = codePix;
                         document.getElementById("valor").innerText = valorParcela;
                         document.getElementById("fatura").innerText = fatura;
+                        document.getElementById("validadePix").innerText = validadePix;
                         closeModal('loading');
                         openModal('dv-modal-pix');
                     }
@@ -131,6 +142,14 @@ function abrirPix() {
 
                     let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
 
+                    let validadePix = convertData(obj.dados.validoAt);
+                    console.log("validadepix", validadePix);
+
+                    // var myDate = validadePix; 
+                    // var date = new Date(myDate); 
+                    // //console.log(date.toLocaleDateString('pt-BR', {timeZone: 'America/Sao_Paulo'}));
+                    // console.log(date.toLocaleDateString('pt-BR', {timeStyle: 'medium'}));
+
                     if (obj) {
                         let valorParcela = Number(obj.dados.valor);
                         valorParcela = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
@@ -142,6 +161,7 @@ function abrirPix() {
                         document.getElementById("codePix").innerText = codePix;
                         document.getElementById("valor").innerText = valorParcela;
                         document.getElementById("fatura").innerText = fatura;
+                        document.getElementById("validadePix").innerText = validadePix;
                         closeModal('loading');
                         openModal('dv-modal-pix');
                     }
