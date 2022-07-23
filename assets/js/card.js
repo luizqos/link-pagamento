@@ -1,4 +1,4 @@
-const mp = new MercadoPago('TEST-3e3952d9-bfbc-4200-b369-4deb51ffdc48');
+const mp = new MercadoPago('APP_USR-aae0e43d-3f9a-46a6-883e-ab670dc5ccf2');
 
 function openModal(mn) {
     let modal = document.getElementById(mn);
