@@ -7,11 +7,15 @@
     <title>Pagamento</title>
     <link rel="icon" type="image/x-icon" href="./assets/img/favicon.ico">
     <!-- Custom styles for this template -->
+    <link href="./assets/css/card.css" rel="stylesheet">
     <link href="./assets/css/custom.css" rel="stylesheet">
     <link href="./assets/css/index.css" rel="stylesheet">
     <link href="./assets/css/pricing.css" rel="stylesheet">
     <link href="./assets/css/modal.css" rel="stylesheet">
+    <script src="./assets/js/cardMask.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 </head>
 
 <body>
@@ -75,7 +79,7 @@
                             <ul class="list-unstyled mt-3 mb-4">
                                 <img src="./assets/img/cartao.png" width="200px">
                             </ul>
-                            <button type="button" class="w-100 btn btn-lg btn-outline-primary">Pagar</button>
+                            <button type="button" onClick="buscaValorCard()" class="w-100 btn btn-lg btn-outline-primary">Pagar</button>
                         </div>
                     </div>
                 </div>
@@ -145,12 +149,115 @@
         </div>
     </div>
 
+    <div id="dv-modal-card" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <img class="btn-sair" onClick="closeModal('dv-modal-card')" src="./assets/img/exit.png">
+                <div class="payment-main-wrapper">
+    
+                    <div class="user-card-info-wrapper">
+                        
+                        <h3>Dados do titular do cartão</h3>
+                        <form id="form-checkout">
+                            <div class="row">
+                                <div class="col">
+                                  <label for="cc-nome">Nome no cartão</label>
+                                  <input type="text" onKeyPress="javascript:this.value=this.value.toUpperCase();" onblur="javascript:this.value=this.value.toUpperCase();" class="form-control" id="form-checkout__cardholderName" placeholder="" required>
+                                  <small class="text-muted">Como mostrado no cartão.</small>
+                                  <div class="invalid-feedback">
+                                    O nome que está no cartão é obrigatório.
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="cc-numero">Número do cartão</label>
+                                    <input type="tel"  maxlength="19" class="form-control" id="form-checkout__cardNumber" placeholder="" required>
+                                    <div class="invalid-feedback">
+                                    O número do cartão de crédito é obrigatório.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="cc-expiracao">Validade</label>
+                                    <input type="text" class="form-control" id="form-checkout__expirationDate" placeholder="MM/AA" required>
+                                    <div class="invalid-feedback">
+                                      Data de expiração é obrigatória.
+                                    </div>
+                                  </div>
+                                  <div class="col-4">
+                                    <label for="cc-cvv">CVV</label>
+                                    <input type="number"  pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==3) return false;" class="form-control" id="form-checkout__securityCode" placeholder="" required>
+                                    <div class="invalid-feedback">
+                                      Código de segurança é obrigatório.
+                                    </div>
+                                    <select hidden class="form-select" id="form-checkout__issuer"></select> 
+                                  </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <label for="parcela">Parcelamento</label>
+                                    <select class="form-select" id="form-checkout__installments" required="">
+                                      <option value="">Escolha...</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                      Por favor, informe uma parcela.
+                                    </div>
+                                  </div>
+                            </div>
+
+                            <!-- <div id="form-checkout__cardNumber" class="container-card"></div> -->
+                            <!-- <div id="form-checkout__expirationDate" class="container-card"></div>
+                            <div id="form-checkout__securityCode" class="container-card"></div> -->
+                            <!-- <input type="text" id="form-checkout__cardholderName" /> -->
+                            <!-- <select id="form-checkout__issuer"></select>  -->
+                            <!-- <select id="form-checkout__installments"></select> -->
+                            <input type="hidden" id="form-checkout__identificationType"/>
+                            <input type="hidden" id="form-checkout__identificationNumber" /> 
+                            <input type="hidden" id="form-checkout__cardholderEmail" /> 
+                        
+                            <hr class="mb-4">
+                            <button class="btn btn-primary btn-block" id="form-checkout__submit" type="submit">Confirmar</button>
+                            <!-- <progress value="0" class="progress-bar">Carregando...</progress> -->
+                            <div class="progress">
+                                <progress value="0" class="progress-bar bg-success">Carregando...</progress>
+                            </div>
+                          </form>   
+                    </div>
+      
+                </div>
+
+                <!-- <div class="">
+                    <form id="form-checkout">
+                        <div id="form-checkout__cardNumber" class="container"></div>
+                        <div id="form-checkout__expirationDate" class="container"></div>
+                        <div id="form-checkout__securityCode" class="container"></div>
+                        <input type="text" id="form-checkout__cardholderName" />
+                        <select id="form-checkout__issuer"></select>
+                        <select id="form-checkout__installments"></select>
+                        <select id="form-checkout__identificationType"></select>
+                        <input type="text" id="form-checkout__identificationNumber" />
+                        <input type="email" id="form-checkout__cardholderEmail" />
+                      </form>
+                </div> -->
+
+            <div class="modal-footer">
+                <div class="request-card">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="./assets/js/formMask.js"></script>
     <script type="text/javascript" src="./assets/js/pix.js"></script>
     <script type="text/javascript" src="./assets/js/copiar.js"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script type="text/javascript" src="./assets/js/card.js"></script>
+    <script type="text/javascript" src="./assets/js/payment.js"></script>
 
     <script>
         new FormMask(document.querySelector("#cpf"), "___.___.___-__", "_", [".", "-"])
