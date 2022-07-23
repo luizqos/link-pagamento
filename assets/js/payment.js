@@ -1,6 +1,6 @@
 
     const cardForm = mp.cardForm({
-        amount: "100.00",
+        amount: "1.00",
         iframe: true,
         form: {
           id: "form-checkout",
