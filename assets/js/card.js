@@ -11,8 +11,6 @@
     function cardBin(event) {
         let textLength = event.target.value.replace(" ", "").length;
 
-        console.log("qtde", textLength);
-
         if (textLength >= 6) {
             let bin = event.target.value.replace(" ", "").substring(0, 6);
             window.Mercadopago.getPaymentMethod({
@@ -67,7 +65,7 @@
             let form = doc.querySelector('#pay');
             let card = doc.createElement('input');
             card.setAttribute('name', 'token');
-            card.setAttribute('type', 'text');
+            card.setAttribute('type', 'hidden');
             card.setAttribute('value', response.id);
             form.appendChild(card);
             form.submit();
@@ -103,6 +101,22 @@ function buscaValorCard() {
     openModal('dv-modal-card');
 }
 
+$("select[id$=EMonth]").blur(function () {
+
+    let expirationM = $(this).val($('select[id$=EMonth]').val());
+    expirationM = expirationM[0].value;
+    document.getElementById("cardExpirationMonth").value = expirationM;
+    
+});
+
+$("select[id$=EYear]").blur(function () {
+
+    let expirationY = $(this).val($('select[id$=EYear]').val());
+    expirationY = expirationY[0].value;
+    document.getElementById("cardExpirationYear").value = expirationY;
+
+});
+
 /* POPULA CAMPO ANO CARTÃO DE CREDITO*/
 let anos = [];
 let dataAtual = new Date();
@@ -114,7 +128,7 @@ for(let i = 0; i < 25; i++){
     ano = anos.push(anoAtual);
     anoAtual = anoAtual + 1;
 }
-let s = document.getElementById('cardExpirationYear');
+let s = document.getElementById('EYear');
 anos.forEach(function(chave) {
     s.appendChild(new Option(chave, chave));
 });
