@@ -2,7 +2,7 @@
     "use strict";
 
     //Public Key
-    window.Mercadopago.setPublishableKey("TEST-3e3952d9-bfbc-4200-b369-4deb51ffdc48");
+    window.Mercadopago.setPublishableKey("");
 
     //Docs Type
     window.Mercadopago.getIdentificationTypes();
@@ -98,7 +98,63 @@ function closeModal(mn) {
 }
 
 function buscaValorCard() {
-    openModal('dv-modal-card');
+    openModal('dv-modal-cpf-card');
+}
+
+function abrirCard() {
+    let cpf = document.getElementById("cpf-card").value;
+
+    console.log("cpf",cpf);
+
+    if (validarCPF(cpf) === true) {
+        closeModal('dv-modal-cpf-card');
+
+        openModal('loading');
+        
+        $.post(`paymentCard.php?doc=${cpf}`, { card: true }, function (response) {
+            console.log("response", response);
+            try {
+
+                let obj = JSON.parse(response);
+
+                // console.log('Obj>>', obj);
+                closeModal('loading');
+                openModal('dv-modal-card');
+
+
+
+                    if (obj) {
+                        let cpfCadastro = obj.dados.cpf;
+                        let email = obj.dados.email;
+                        let descricao = obj.dados.descricao;
+                        let idvenda = obj.dados.idVenda;
+                        let valorParcela = Number(obj.dados.valor);
+                        valorParcelaFormat = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
+                        let fatura = obj.dados.ref;
+                        fatura = `Fatura: ${fatura}`;
+                        document.getElementById("descricao-titulo").innerText = descricao + ' | ' + valorParcelaFormat;
+                        document.getElementById("docNumber").value = cpfCadastro;
+                        document.getElementById("docNumber").innerText = cpfCadastro;
+                        document.getElementById("email").value = email;
+                        document.getElementById("email").innerText = email;
+                        document.getElementById("amount").value = valorParcela;
+                        document.getElementById("amount").innerText = valorParcela;
+                        document.getElementById("description").value = descricao;
+                        document.getElementById("description").innerText = descricao;
+                        document.getElementById("idvenda").value = idvenda;
+                        document.getElementById("idvenda").innerText = idvenda;
+                        closeModal('loading');
+                    }
+    
+
+            } catch (e) {
+                console.log("erro>>>", e);
+                closeModal('loading');
+                closeModal('dv-modal-card');
+            }
+        });
+    }
+
 }
 
 $("select[id$=EMonth]").blur(function () {
@@ -133,3 +189,13 @@ anos.forEach(function(chave) {
     s.appendChild(new Option(chave, chave));
 });
 
+function botaoBloqueado() {
+
+    setTimeout(() => {       
+        document.getElementById("confirmar").hidden = true;
+        document.getElementById("aguarde").removeAttribute("hidden");
+      }, "500");
+
+
+
+}

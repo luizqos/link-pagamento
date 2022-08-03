@@ -60,18 +60,18 @@ function convertData(data){
     return (n.toLocaleString("pt-BR"));
 }
 
-function buscaValor() {
-    openModal('dv-modal-cpf');
+function buscaValorPix() {
+    openModal('dv-modal-cpf-pix');
 }
 function abrirPix() {
-    let cpf = document.getElementById("cpf").value;
+    let cpf = document.getElementById("cpf-pix").value;
 
     if (validarCPF(cpf) === true) {
-        closeModal('dv-modal-cpf');
+        closeModal('dv-modal-cpf-pix');
 
         openModal('loading');
 
-        $.post(`payment.php?doc=${cpf}`, { pix: true }, function (response) {
+        $.post(`paymentPix.php?doc=${cpf}`, { pix: true }, function (response) {
             try {
 
                 let obj = JSON.parse(response);
