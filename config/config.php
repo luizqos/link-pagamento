@@ -1,7 +1,21 @@
 <?php
-define('SAND_KEY','');
-define('SAND_TOKEN','');
+$ambiente = ''; //VALOR PROD PARA PRODUÇÃO
 
-define('PROD_KEY','');
-define('PROD_TOKEN','');
+$server = "";
+$contraSenha = '';
+if( $ambiente == 'PROD'){
+    $access_token = '';
+    $key = '';
+    $user = "";
+    $pass = "";
+    $db = "";
+}else{
+    $access_token = '';
+    $key = '';
+    $user = "";
+    $pass = "";
+    $db = "";
+}
+$conexao = mysqli_connect($server, $user, $pass, $db);
+mysqli_set_charset($conexao,"utf8");
 ?>

@@ -2,8 +2,7 @@
 // header("Content-type: application/json; charset=iso-8859-1");
 // header('Content-type: text/html; charset=utf-8');
 date_default_timezone_set('America/Sao_Paulo');
-include_once 'conexao.php';
-
+require('../config/config.php');
     
 function string_between_two_string($str, $starting_word, $ending_word)
 {
@@ -84,8 +83,7 @@ $cpf  = $_GET['doc'];
               $gravaPix = 'N';
             }
           }
-        mysqli_close($conexao);
-        
+      
         if($idVenda){
             if($gravaPix == 'S'){
 
@@ -122,10 +120,8 @@ $cpf  = $_GET['doc'];
               $qr_code_base64 = $payment->point_of_interaction->transaction_data->qr_code_base64;
 
               $createPix = date('Y-m-d H:i:s');
-              $validadePix = date($createPix, strtotime('+1days'));
-
-              $conexao = mysqli_connect($servidor, $usuario, $senha, $dbname);
-              
+              $validadePix = date('Y-m-d H:i:s', strtotime('+1days'));
+             
               $sql = "INSERT INTO `pagamentos_pix` (`idVenda`, `codePix`, `qrCode`, `dataCreated`) VALUES ($idVenda, '$qr_code', '$qr_code_base64', '$createPix')";
 
               mysqli_query($conexao,$sql);

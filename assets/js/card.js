@@ -1,8 +1,13 @@
 (function (win, doc) {
     "use strict";
-
+    let getUrl = window.location;
+    let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+    let contrasenha = '$2a$10$g9y0p121fpWpgALlFnFux.MGK90y.5RA57/RKxkaWClcICnleT0iO';
+            
     //Public Key
-    window.Mercadopago.setPublishableKey("");
+   $.getJSON(baseUrl + "/config/getKey.php?req=" + contrasenha, function( data ) {
+    window.Mercadopago.setPublishableKey(data.key);
+    });
 
     //Docs Type
     window.Mercadopago.getIdentificationTypes();
@@ -22,6 +27,10 @@
                 "amount": parseFloat(document.querySelector('#amount').value),
             }, setInstallmentInfo);
         }
+        if (textLength >= 16) {
+            document.getElementById("Parcelamento").innerText = 'Parcelamento';
+            document.getElementById("installments").removeAttribute("hidden");
+        }
     }
     if (doc.querySelector('#cardNumber')) {
         let cardNumber = doc.querySelector('#cardNumber');
@@ -31,7 +40,7 @@
 
     //Set Installments
     function setInstallmentInfo(status, response) {
-        console.log("resposen parcela", response);
+
         let label = response[0].payer_costs;
         let installmentsSel = doc.querySelector('#installments');
         installmentsSel.options.length = 0;
@@ -101,37 +110,72 @@ function buscaValorCard() {
     openModal('dv-modal-cpf-card');
 }
 
+function validarCPF(cpf) {
+    cpf = cpf.replace(/[^\d]+/g, '');
+    if (cpf == '') return false;
+    // Elimina CPFs invalidos conhecidos	
+    if (cpf.length != 11 ||
+        cpf == "00000000000" ||
+        cpf == "11111111111" ||
+        cpf == "22222222222" ||
+        cpf == "33333333333" ||
+        cpf == "44444444444" ||
+        cpf == "55555555555" ||
+        cpf == "66666666666" ||
+        cpf == "77777777777" ||
+        cpf == "88888888888" ||
+        cpf == "99999999999")
+        return false;
+    // Valida 1o digito	
+    add = 0;
+    for (i = 0; i < 9; i++)
+        add += parseInt(cpf.charAt(i)) * (10 - i);
+    rev = 11 - (add % 11);
+    if (rev == 10 || rev == 11)
+        rev = 0;
+    if (rev != parseInt(cpf.charAt(9)))
+        return false;
+    // Valida 2o digito	
+    add = 0;
+    for (i = 0; i < 10; i++)
+        add += parseInt(cpf.charAt(i)) * (11 - i);
+    rev = 11 - (add % 11);
+    if (rev == 10 || rev == 11)
+        rev = 0;
+    if (rev != parseInt(cpf.charAt(10)))
+        return false;
+    return true;
+}
+
 function abrirCard() {
     let cpf = document.getElementById("cpf-card").value;
-
-    console.log("cpf",cpf);
 
     if (validarCPF(cpf) === true) {
         closeModal('dv-modal-cpf-card');
 
         openModal('loading');
         
-        $.post(`paymentCard.php?doc=${cpf}`, { card: true }, function (response) {
-            console.log("response", response);
+        $.post(`./payment/Card.php?doc=${cpf}`, { card: true }, function (response) {
+       
             try {
 
                 let obj = JSON.parse(response);
 
-                // console.log('Obj>>', obj);
                 closeModal('loading');
                 openModal('dv-modal-card');
-
-
-
+                
                     if (obj) {
                         let cpfCadastro = obj.dados.cpf;
                         let email = obj.dados.email;
                         let descricao = obj.dados.descricao;
                         let idvenda = obj.dados.idVenda;
+                        
                         let valorParcela = Number(obj.dados.valor);
                         valorParcelaFormat = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
+                        
                         let fatura = obj.dados.ref;
                         fatura = `Fatura: ${fatura}`;
+                        
                         document.getElementById("descricao-titulo").innerText = descricao + ' | ' + valorParcelaFormat;
                         document.getElementById("docNumber").value = cpfCadastro;
                         document.getElementById("docNumber").innerText = cpfCadastro;
@@ -144,15 +188,64 @@ function abrirCard() {
                         document.getElementById("idvenda").value = idvenda;
                         document.getElementById("idvenda").innerText = idvenda;
                         closeModal('loading');
+                    }else{
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        })
+
+                        Toast.fire({
+                            icon: 'info',
+                            title: 'Não identificamos débitos pendentes para este CPF'
+                        })
                     }
     
-
             } catch (e) {
-                console.log("erro>>>", e);
+                //console.log("erro>>>", e);
                 closeModal('loading');
                 closeModal('dv-modal-card');
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+                Toast.fire({
+                    icon: 'info',
+                    title: 'Não identificamos débitos pendentes para este CPF'
+                })
             }
         });
+    }
+    else{
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        Toast.fire({
+            icon: 'error',
+            title: 'CPF Inválido.'
+        })
     }
 
 }
@@ -190,12 +283,8 @@ anos.forEach(function(chave) {
 });
 
 function botaoBloqueado() {
-
     setTimeout(() => {       
         document.getElementById("confirmar").hidden = true;
         document.getElementById("aguarde").removeAttribute("hidden");
       }, "500");
-
-
-
 }

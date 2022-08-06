@@ -1,91 +1,30 @@
 <?php
+
+$uuid=(isset($_GET['uuid'])) ? $_GET['uuid'] : 1;
+
 require('../config/config.php');
-require('../mercadopago/lib/mercadopago/vendor/autoload.php');
 
-#Variables
-$email=filter_input(INPUT_POST,'email',FILTER_VALIDATE_EMAIL);
-$cardNumber=filter_input(INPUT_POST,'cardNumber',FILTER_DEFAULT);
-$securityCode=filter_input(INPUT_POST,'securityCode',FILTER_DEFAULT);
-$cardExpirationMonth=filter_input(INPUT_POST,'cardExpirationMonth',FILTER_DEFAULT);
-$cardExpirationYear=filter_input(INPUT_POST,'cardExpirationYear',FILTER_DEFAULT);
-$cardholderName=filter_input(INPUT_POST,'cardholderName',FILTER_DEFAULT);
-$docType=filter_input(INPUT_POST,'docType',FILTER_DEFAULT);
-$docNumber=filter_input(INPUT_POST,'docNumber',FILTER_DEFAULT);
-$installments=filter_input(INPUT_POST,'installments',FILTER_DEFAULT);
-$amount=filter_input(INPUT_POST,'amount',FILTER_DEFAULT);
-$description=filter_input(INPUT_POST,'description',FILTER_DEFAULT);
-$paymentMethodId=filter_input(INPUT_POST,'paymentMethodId',FILTER_DEFAULT);
-$token=filter_input(INPUT_POST,'token',FILTER_DEFAULT);
-$idVenda=filter_input(INPUT_POST,'idvenda',FILTER_DEFAULT);
+$sql = "SELECT * FROM transacoes where uuid  = '$uuid'";
 
-#Method
-MercadoPago\SDK::setAccessToken(PROD_TOKEN);
-$payment = new MercadoPago\Payment();
-$payment->transaction_amount = $amount;
-$payment->token = $token;
-$payment->description = $description;
-$payment->installments = $installments;
-$payment->payment_method_id = $paymentMethodId;
-$payment->payer = array(
-    "email" => $email
-);
-$payment->save();
- //echo '<pre>',print_r($payment),'</pre>';
- 
-// $response = array(
-//     'status' => $payment->status,
-//     'amount' => $payment->transaction_amount,
-//     'status_detail' => $payment->status_detail,
-//     'cardholder' => $payment->payment_method_id,
-//     'cardtype' => $payment->payment_type_id,
-//     'transaction' => $payment->collector_id,
-//     'expiration' => $payment->card->expiration_month . '/'. $payment->card->expiration_year,
-//     'cardnumber' => $payment->card->first_six_digits . 'XX XXXX '. $payment->card->last_four_digits,
-//     'holdername' => $payment->card->cardholder->name,
-//     'id' => $payment->id
-// );
-// $dados =  json_encode($response);
+$result = mysqli_query($conexao,$sql);
 
-
-function random_str_ossl($size) 
-{
-    return bin2hex(openssl_random_pseudo_bytes($size));
+foreach($result as $r) {
+  $uuid = $r['uuid'];
+  $idsale = $r['idsale'];
+  $description = $r['description'];
+  $status = $r['status'];
+  $amount = $r['amount'];
+  $totalpaid = $r['totalpaid'];
+  $installmentsvalue = $r['installmentsvalue'];
+  $totalinstallments = $r['totalinstallments'];
+  $status_detail = $r['statusdetail'];
+  $cardholder = $r['cardholder'];
+  $expiration = $r['expiration'];
+  $cardnumber = $r['cardnumber'];
+  $holdername = $r['holdername'];
 }
 
-$uuid = random_str_ossl(20);
-
-$status = $payment->status;
-$paid = $payment->transaction_amount;
-$totalpaid = $payment->transaction_details->total_paid_amount;
-$totalinstallments = $payment->installments;
-$installmentsvalue = $payment->transaction_details->installment_amount;
-$status_detail = $payment->status_detail;
-$cardholder = $payment->payment_method_id;
-$cardtype = $payment->payment_type_id;
-$transaction = $payment->collector_id;
-$expiration = $payment->card->expiration_month . '/'. $payment->card->expiration_year;
-$cardnumberhide = $payment->card->first_six_digits . 'XXXXXX'. $payment->card->last_four_digits;
-$holdername = $payment->card->cardholder->name;
-
-
-include('../conexao.php');
-// Create connection
-$conn = new mysqli($servidor, $usuario, $senha, $dbname);
-// Check connection
-if ($conn->connect_error) {
-  die("Connection Falhou: " . $conn->connect_error);
-}
-
-$sql = "INSERT INTO transacoes (uuid, idsale, description, status, amount, totalpaid, installmentsvalue, totalinstallments, statusdetail, cardholder, cardtype, transaction, expiration, cardnumber, holdername)
-VALUES ('$uuid', $idVenda, '$description', '$status', $paid, $totalpaid, $installmentsvalue, $totalinstallments, '$status_detail', '$cardholder', '$cardtype', $transaction, '$expiration', '$cardnumberhide', '$holdername');";
-
-if ($conn->multi_query($sql) === TRUE) {
-  //echo "Registro inserido com sucesso";
-} else {
-  //echo "Error: " . $sql . "<br>" . $conn->error;
-}
-
-$conn->close();
+$conexao->close();
 
 if($status == 'approved'){
   $status = 'Aprovado';
@@ -95,8 +34,45 @@ if($status == 'approved'){
   $icon = 'error';
 }
 
-?>
+switch ($status_detail) {
+  case 'cc_rejected_bad_filled_security_code':
+    $status_detail = ', verifique o cvv digitado!';
+    break;
+  case 'cc_rejected_bad_filled_card_number':
+    $status_detail = ', verifique o número do cartão digitado!';
+    break;
+  case 'cc_rejected_bad_filled_date':
+    $status_detail = ', verifique a data de vencimento digitada!';
+    break;
+  case 'cc_rejected_bad_filled_other':
+    $status_detail = ', verifique os dados digitados!';
+    break;
+  case 'cc_rejected_blacklist':
+    $status_detail = ', Não pudemos processar seu pagamento.';
+    break;
+  case 'cc_rejected_card_disabled':
+    $status_detail = ', Seu cartão não está ativo, verifique com sua operadora.';
+    break;
+  case 'cc_rejected_card_error':
+    $status_detail = ', Não conseguimos processar seu pagamento.';
+    break;
+  case 'cc_rejected_duplicated_payment':
+    $status_detail = ', Você já efetuou um pagamento com esse valor. Caso precise pagar novamente, utilize outro cartão ou outra forma de pagamento.';
+    break;
+  case 'cc_rejected_insufficient_amount':
+    $status_detail = ', Saldo insuficiente';
+    break;
+  case 'cc_rejected_max_attempts':
+    $status_detail = ', Você atingiu o limite de tentativas permitidas';
+    break;
+  case 'cc_rejected_call_for_authorize':
+    $status_detail = ', Verifique os dados do cartão.';
+    break;
+  default:
+  $status_detail = '';
+}
 
+?>
 <!doctype html>
 <html lang="pt-br">
 
@@ -128,22 +104,21 @@ if($status == 'approved'){
         <div class="content-return">
           <p><b><span><?php echo $description;?></span></b></p>
           <p><b>Transação: </b><span><?php echo $uuid;?></span></p>
-          <p><b>Status: </b><span><?php echo $status;?></span></p>
-          <p><b>Valor: </b><span><?php echo 'R$ ' . number_format($paid, 2, ',', '.');?></span></p>
+          <p><b>Status: </b><span><?php echo $status . $status_detail;?></span></p>
+          <p><b>Valor: </b><span><?php echo 'R$ ' . number_format($amount, 2, ',', '.');?></span></p>
 
             <?php  
                 if ($totalinstallments > 1)
                 {
             ?>
-                  <p><b>Valor Parcelado: </b><span><?php echo 'R$ ' . number_format($totalpaid, 2, ',', '.');?></span></p>
-                  <p><b>Parcelamento: </b><span><?php echo $totalinstallments . ' parcela(s) de R$ ' . number_format($installmentsvalue, 2, ',', '.');?></span></p>
+                  <p><b>Parcelado: </b><span><?php echo 'R$ ' . number_format($totalpaid, 2, ',', '.') . ' em ' . $totalinstallments . ' parcela(s) de R$ ' . number_format($installmentsvalue, 2, ',', '.') ;?></span></p>
             <?php  
             }
             ?>
             
           <p><b>Cartão: </b><span><?php echo strtoupper($cardholder);?></span></p>
           <p><b>Titular do Cartão: </b><span><?php echo strtoupper($holdername);?></span></p>
-          <p><b>Nº do Cartão: </b><span><?php echo $cardnumberhide;?></span></p>
+          <p><b>Nº do Cartão: </b><span><?php echo $cardnumber;?></span></p>
           <p><b>Validade: </b><span><?php echo $expiration;?></span></p>
         </div>
         <br />
