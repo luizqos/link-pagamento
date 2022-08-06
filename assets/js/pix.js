@@ -71,13 +71,11 @@ function abrirPix() {
 
         openModal('loading');
 
-        $.post(`paymentPix.php?doc=${cpf}`, { pix: true }, function (response) {
+        $.post(`./payment/Pix.php?doc=${cpf}`, { pix: true }, function (response) {
             try {
 
                 let obj = JSON.parse(response);
-
-                console.log('Obj>>', obj);
-
+                
                 if(obj.dados.gerapix == 'S'){
                     if (typeof obj.pix.status != "undefined") {
                         if (obj.pix.status) {
@@ -114,8 +112,9 @@ function abrirPix() {
 
                     let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
                     
+                    //console.log(obj.dados.validoAt);
                     let validadePix = convertData(obj.dados.validoAt);
-                    console.log("validadepix", validadePix);
+                    
 
                     if (obj) {
                         let valorParcela = Number(obj.dados.valor);
@@ -143,12 +142,6 @@ function abrirPix() {
                     let qrCode = ('src', 'data:image/jpeg;base64,' + base64);
 
                     let validadePix = convertData(obj.dados.validoAt);
-                    console.log("validadepix", validadePix);
-
-                    // var myDate = validadePix; 
-                    // var date = new Date(myDate); 
-                    // //console.log(date.toLocaleDateString('pt-BR', {timeZone: 'America/Sao_Paulo'}));
-                    // console.log(date.toLocaleDateString('pt-BR', {timeStyle: 'medium'}));
 
                     if (obj) {
                         let valorParcela = Number(obj.dados.valor);
@@ -167,7 +160,6 @@ function abrirPix() {
                     }
                 }
             } catch (e) {
-                console.log("erro>>>", e);
                 closeModal('loading');
                 closeModal('dv-modal-pix');
                 const Toast = Swal.mixin({

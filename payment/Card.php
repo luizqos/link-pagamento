@@ -1,6 +1,6 @@
 <?php
 date_default_timezone_set('America/Sao_Paulo');
-include_once 'conexao.php';
+require('../config/config.php');
 
     
 function string_between_two_string($str, $starting_word, $ending_word)
@@ -77,16 +77,27 @@ $cpf  = $_GET['doc'];
 
       }
     }
-    echo json_encode(
-      array(
-        'dados'=>  array(
-        'idVenda'  => $idVenda,
-        'cpf' => limpaCPF($cpf),
-        'email' => $email,
-        'valor' => $valor,
-        'descricao' => $descricao,
-        'ref' => $ref
-        )
-        ));
+    if($idVenda){
+      echo json_encode(
+        array(
+          'dados'=>  array(
+          'idVenda'  => $idVenda,
+          'cpf' => limpaCPF($cpf),
+          'email' => $email,
+          'valor' => $valor,
+          'descricao' => $descricao,
+          'ref' => $ref
+          )
+          ));
+    } else{
+      echo json_encode(
+        array(
+          'dados'=>  array(
+          'erro'  => 'Não existe débito aberto para este CPF.'
+          )
+          ));
+    }
+
+
   } 
 ?>

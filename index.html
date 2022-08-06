@@ -167,7 +167,7 @@
                 <div class="user-card-info-wrapper">
 
 
-                    <form action="./card/" method="post" id="pay" name="pay">
+                    <form action="./card/process.php" method="post" id="pay" name="pay">
                         <div class="row">
                             <div class="col">
                                 <label for="cc-nome">Nome no cartão</label>
@@ -253,8 +253,8 @@
                         </div>
                         <div class="row">
                             <div class="col-md-10">
-                                <label for="installments">Parcelamento</label>
-                                <select class="form-select" id="installments" name="installments" required="">
+                                <label id="Parcelamento" for="installments"></label>
+                                <select hidden class="form-select" id="installments" name="installments" required="">
                                     <!-- <option value="">Escolha...</option> -->
                                 </select>
                                 <div class="invalid-feedback">
