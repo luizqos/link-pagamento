@@ -176,8 +176,8 @@ function abrirPix() {
                     }
                 })
                 Toast.fire({
-                    icon: 'error',
-                    title: 'Ocorreu um erro.'
+                    icon: 'info',
+                    title: 'Não conseguimos encontrar seu débito'
                 })
             }
         });
