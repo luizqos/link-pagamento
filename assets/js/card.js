@@ -200,7 +200,8 @@ function abrirCard() {
                                 toast.addEventListener('mouseleave', Swal.resumeTimer)
                             }
                         })
-
+                        closeModal('loading');
+                        closeModal('dv-modal-card');
                         Toast.fire({
                             icon: 'info',
                             title: 'Não identificamos débitos pendentes para este CPF'
