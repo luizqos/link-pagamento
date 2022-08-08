@@ -87,7 +87,7 @@ $cpf  = $_GET['doc'];
         if($idVenda){
             if($gravaPix == 'S'){
 
-              require_once 'mercadopago/lib/mercadopago/vendor/autoload.php';
+              require_once '../mercadopago/lib/mercadopago/vendor/autoload.php';
 
               MercadoPago\SDK::setAccessToken($access_token);
       
