@@ -75,6 +75,7 @@ function abrirPix() {
             try {
 
                 let obj = JSON.parse(response);
+       
                 
                 if(obj.dados.gerapix == 'S'){
                     if (typeof obj.pix.status != "undefined") {
@@ -160,6 +161,7 @@ function abrirPix() {
                     }
                 }
             } catch (e) {
+                console.log(e);
                 closeModal('loading');
                 closeModal('dv-modal-pix');
                 const Toast = Swal.mixin({
@@ -174,8 +176,8 @@ function abrirPix() {
                     }
                 })
                 Toast.fire({
-                    icon: 'info',
-                    title: 'Não identificamos débitos pendentes para este CPF'
+                    icon: 'error',
+                    title: 'Ocorreu um erro.'
                 })
             }
         });

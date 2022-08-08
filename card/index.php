@@ -83,6 +83,7 @@ switch ($status_detail) {
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon.ico">
     <link href="../assets/css/index.css" rel="stylesheet">
     <link href="../assets/css/custom.css" rel="stylesheet">
+    <link href="../assets/css/card.css" rel="stylesheet">
  
   <!-- Custom styles for this template -->
   <link href="https://getbootstrap.com/docs/5.2/examples/sign-in/signin.css" rel="stylesheet">

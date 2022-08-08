@@ -36,3 +36,9 @@
     border-bottom: solid 2px #efebe9;
 
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: content-box;
+}
