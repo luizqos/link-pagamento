@@ -97,7 +97,7 @@ $cpf  = $_GET['doc'];
               $payment->transaction_amount = (double)$valor;
               $payment->payment_method_id = "pix";
       
-              $payment->notification_url  = 'https://seusite.com/notification.php';
+              $payment->notification_url  = $linkNotification . '/payment/notification.php';
               $payment->external_reference = $idVenda;
       
                 $payment->payer = array(
