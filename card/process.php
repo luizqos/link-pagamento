@@ -53,8 +53,9 @@ $holdername = $payment->card->cardholder->name;
 
 
 // Create connection
-mysqli_set_charset($conexao,"utf8");
 $conn = new mysqli($server, $user, $pass, $db);
+mysqli_set_charset($conn,"utf8");
+
 // Check connection
 if ($conn->connect_error) {
   die("Connection Falhou: " . $conn->connect_error);
@@ -66,6 +67,12 @@ $sql = "INSERT INTO transacoes (uuid, idsale, description, status, amount, total
 VALUES ('$uuid', $idVenda, '$description', '$status', $paid, $totalpaid, $installmentsvalue, $totalinstallments, '$status_detail', '$cardholder', '$cardtype', $transaction, '$expiration', '$cardnumberhide', '$holdername');";
 
 if ($conn->multi_query($sql) === TRUE) {
+  if($status === 'approved'){
+    $registraBaixa = "UPDATE lancamentos SET baixado = 1, data_pagamento = now(), forma_pgto = 'Cartão de Crédito' where vendas_id = $idVenda";
+    if ($conn->query($registraBaixa) === TRUE) {
+      $conn->close();
+    } 
+  }
   $conn->close();
 
 } else {
