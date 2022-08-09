@@ -71,7 +71,9 @@ if ($conn->multi_query($sql) === TRUE) {
     $registraBaixa = "UPDATE lancamentos SET baixado = 1, data_pagamento = now(), forma_pgto = 'Cartão de Crédito' where vendas_id = $idVenda";
     if ($conn->query($registraBaixa) === TRUE) {
       $conn->close();
-    } 
+    }else{
+      $conn->close();
+    }
   }
 } else {
   $conn->close();
