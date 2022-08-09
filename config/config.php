@@ -4,12 +4,14 @@ $ambiente = ''; //VALOR PROD PARA PRODUÇÃO
 $server = "";
 $contraSenha = '';
 if( $ambiente == 'PROD'){
+    $linkNotification = '';
     $access_token = '';
     $key = '';
     $user = "";
     $pass = "";
     $db = "";
 }else{
+    $linkNotification = '';
     $access_token = '';
     $key = '';
     $user = "";

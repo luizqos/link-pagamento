@@ -73,8 +73,6 @@ if ($conn->multi_query($sql) === TRUE) {
       $conn->close();
     } 
   }
-  $conn->close();
-
 } else {
   $conn->close();
 }
