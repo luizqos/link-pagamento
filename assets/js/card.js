@@ -1,11 +1,10 @@
 (function (win, doc) {
     "use strict";
-    let getUrl = window.location;
-    let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+    const baseUrl = window.location.href;
     let contrasenha = '$2a$10$g9y0p121fpWpgALlFnFux.MGK90y.5RA57/RKxkaWClcICnleT0iO';
             
     //Public Key
-   $.getJSON(baseUrl + "/config/getKey.php?req=" + contrasenha, function( data ) {
+   $.getJSON(baseUrl + "config/getKey.php?req=" + contrasenha, function( data ) {
     window.Mercadopago.setPublishableKey(data.key);
     });
 
@@ -58,9 +57,7 @@
         if (status == 200) {
             const paymentMethodElement = doc.querySelector('input[name=paymentMethodId]');
             paymentMethodElement.value = response[0].id;
-            doc.querySelector('.brand').innerHTML = "<img src='" + response[0].thumbnail + "' alt='Bandeira do Cartão'>";
-        } else {
-            alert(`payment method info error: ${response}`);
+            doc.querySelector('.brand').innerHTML = "<img width='36' src='" + baseUrl + 'assets/img/brand/' + response[0].id + '.png' + "' alt=''>";
         }
     }
 
