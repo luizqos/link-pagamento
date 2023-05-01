@@ -1,5 +1,6 @@
 <?php
 $ambiente = ''; //VALOR PROD PARA PRODUÇÃO
+$endpoint = ''
 
 $server = "";
 $contraSenha = '';
