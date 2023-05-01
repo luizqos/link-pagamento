@@ -1,12 +1,12 @@
 (function (win, doc) {
     "use strict";
     let getUrl = window.location;
-    let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+    let baseUrl = protocol + "/" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
     let contrasenha = '$2a$10$g9y0p121fpWpgALlFnFux.MGK90y.5RA57/RKxkaWClcICnleT0iO';
-            
+
     //Public Key
-   $.getJSON(baseUrl + "/config/getKey.php?req=" + contrasenha, function( data ) {
-    window.Mercadopago.setPublishableKey(data.key);
+    $.getJSON(baseUrl + "/config/getKey.php?req=" + contrasenha, function (data) {
+        window.Mercadopago.setPublishableKey(data.key);
     });
 
     //Docs Type
@@ -154,60 +154,60 @@ function abrirCard() {
         closeModal('dv-modal-cpf-card');
 
         openModal('loading');
-        
+
         $.post(`./payment/Card.php?doc=${cpf}`, { card: true }, function (response) {
-       
+
             try {
 
                 let obj = JSON.parse(response);
 
                 closeModal('loading');
                 openModal('dv-modal-card');
-                
-                    if (obj) {
-                        let cpfCadastro = obj.dados.cpf;
-                        let email = obj.dados.email;
-                        let descricao = obj.dados.descricao;
-                        let idvenda = obj.dados.idVenda;
-                        
-                        let valorParcela = Number(obj.dados.valor);
-                        valorParcelaFormat = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
-                        
-                        let fatura = obj.dados.ref;
-                        fatura = `Fatura: ${fatura}`;
-                        
-                        document.getElementById("descricao-titulo").innerText = descricao + ' | ' + valorParcelaFormat;
-                        document.getElementById("docNumber").value = cpfCadastro;
-                        document.getElementById("docNumber").innerText = cpfCadastro;
-                        document.getElementById("email").value = email;
-                        document.getElementById("email").innerText = email;
-                        document.getElementById("amount").value = valorParcela;
-                        document.getElementById("amount").innerText = valorParcela;
-                        document.getElementById("description").value = descricao;
-                        document.getElementById("description").innerText = descricao;
-                        document.getElementById("idvenda").value = idvenda;
-                        document.getElementById("idvenda").innerText = idvenda;
-                        closeModal('loading');
-                    }else{
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 5000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.addEventListener('mouseenter', Swal.stopTimer)
-                                toast.addEventListener('mouseleave', Swal.resumeTimer)
-                            }
-                        })
-                        closeModal('loading');
-                        closeModal('dv-modal-card');
-                        Toast.fire({
-                            icon: 'info',
-                            title: 'Não identificamos débitos pendentes para este CPF'
-                        })
-                    }
-    
+
+                if (obj) {
+                    let cpfCadastro = obj.dados.cpf;
+                    let email = obj.dados.email;
+                    let descricao = obj.dados.descricao;
+                    let idvenda = obj.dados.idVenda;
+
+                    let valorParcela = Number(obj.dados.valor);
+                    valorParcelaFormat = `Valor: ${valorParcela.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}`;
+
+                    let fatura = obj.dados.ref;
+                    fatura = `Fatura: ${fatura}`;
+
+                    document.getElementById("descricao-titulo").innerText = descricao + ' | ' + valorParcelaFormat;
+                    document.getElementById("docNumber").value = cpfCadastro;
+                    document.getElementById("docNumber").innerText = cpfCadastro;
+                    document.getElementById("email").value = email;
+                    document.getElementById("email").innerText = email;
+                    document.getElementById("amount").value = valorParcela;
+                    document.getElementById("amount").innerText = valorParcela;
+                    document.getElementById("description").value = descricao;
+                    document.getElementById("description").innerText = descricao;
+                    document.getElementById("idvenda").value = idvenda;
+                    document.getElementById("idvenda").innerText = idvenda;
+                    closeModal('loading');
+                } else {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    })
+                    closeModal('loading');
+                    closeModal('dv-modal-card');
+                    Toast.fire({
+                        icon: 'info',
+                        title: 'Não identificamos débitos pendentes para este CPF'
+                    })
+                }
+
             } catch (e) {
                 //console.log("erro>>>", e);
                 closeModal('loading');
@@ -230,7 +230,7 @@ function abrirCard() {
             }
         });
     }
-    else{
+    else {
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -256,7 +256,7 @@ $("select[id$=EMonth]").blur(function () {
     let expirationM = $(this).val($('select[id$=EMonth]').val());
     expirationM = expirationM[0].value;
     document.getElementById("cardExpirationMonth").value = expirationM;
-    
+
 });
 
 $("select[id$=EYear]").blur(function () {
@@ -274,18 +274,18 @@ let anoAtual = dataAtual.getFullYear();
 
 let ano = anos.push();
 
-for(let i = 0; i < 25; i++){
+for (let i = 0; i < 25; i++) {
     ano = anos.push(anoAtual);
     anoAtual = anoAtual + 1;
 }
 let s = document.getElementById('EYear');
-anos.forEach(function(chave) {
+anos.forEach(function (chave) {
     s.appendChild(new Option(chave, chave));
 });
 
 function botaoBloqueado() {
-    setTimeout(() => {       
+    setTimeout(() => {
         document.getElementById("confirmar").hidden = true;
         document.getElementById("aguarde").removeAttribute("hidden");
-      }, "500");
+    }, "500");
 }
