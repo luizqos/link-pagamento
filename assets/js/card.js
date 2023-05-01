@@ -1,7 +1,7 @@
 (function (win, doc) {
     "use strict";
     let getUrl = window.location;
-    let baseUrl = protocol + "/" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+    let baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
     let contrasenha = '$2a$10$g9y0p121fpWpgALlFnFux.MGK90y.5RA57/RKxkaWClcICnleT0iO';
 
     //Public Key
