@@ -22,6 +22,16 @@ if ($conn->connect_error) {
   die("Connection Falhou: " . $conn->connect_error);
 }
 
+// Busca IPTV
+$buscaCliente = "SELECT clientes.userIptv from vendas inner join clientes on clientes.idClientes = vendas.clientes_id where idVendas = $idVenda";
+$result = $conn->query($buscaCliente);
+  if ($result->num_rows > 0) {
+    // Percorre cada linha do resultado
+    while ($row = $result->fetch_assoc()) {
+        $userIptv = $row["userIptv"];
+    }
+  }
+
     $sql = "INSERT INTO ipn (idVenda, payment_type_id, status, status_detail, description, transaction_amount, installments)
     VALUES ($idVenda, '$payment_type_id', '$status', '$status_detail', '$description', $transaction_amount, $installments);";
 
@@ -30,6 +40,7 @@ if ($conn->multi_query($sql) === TRUE) {
     $registraBaixa = "UPDATE lancamentos SET baixado = 1, data_pagamento = now(), forma_pgto = 'Pix' where vendas_id = $idVenda";
     if ($conn->query($registraBaixa) === TRUE) {
       $conn->close();
+      renovaAssinatura($userIptv);
     }else{
       $conn->close();
     }
@@ -38,6 +49,23 @@ if ($conn->multi_query($sql) === TRUE) {
   $conn->close();
 }
 
+function renovaAssinatura($loginIptv) {
+  $curl = curl_init();
 
+curl_setopt_array($curl, array(
+  CURLOPT_URL => $endpoint.$loginIptv,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+}
 
 ?>
