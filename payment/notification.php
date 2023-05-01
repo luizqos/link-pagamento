@@ -40,7 +40,7 @@ if ($conn->multi_query($sql) === TRUE) {
     $registraBaixa = "UPDATE lancamentos SET baixado = 1, data_pagamento = now(), forma_pgto = 'Pix' where vendas_id = $idVenda";
     if ($conn->query($registraBaixa) === TRUE) {
       $conn->close();
-      renovaAssinatura($userIptv);
+      renovaAssinatura($endpoint,$userIptv);
     }else{
       $conn->close();
     }
@@ -49,7 +49,7 @@ if ($conn->multi_query($sql) === TRUE) {
   $conn->close();
 }
 
-function renovaAssinatura($loginIptv) {
+function renovaAssinatura($endpoint,$loginIptv) {
   $curl = curl_init();
 
 curl_setopt_array($curl, array(
