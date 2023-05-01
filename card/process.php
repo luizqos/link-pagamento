@@ -36,6 +36,25 @@ function random_str_ossl($size)
     return bin2hex(openssl_random_pseudo_bytes($size));
 }
 
+function renovaAssinatura($endpoint,$loginIptv) {
+  $curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => $endpoint.$loginIptv,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+}
+
 $uuid = random_str_ossl(20);
 
 $status = $payment->status;
@@ -61,6 +80,16 @@ if ($conn->connect_error) {
   die("Connection Falhou: " . $conn->connect_error);
 }
 
+// Busca IPTV
+$buscaCliente = "SELECT clientes.userIptv from vendas inner join clientes on clientes.idClientes = vendas.clientes_id where idVendas = $idVenda";
+$result = $conn->query($buscaCliente);
+  if ($result->num_rows > 0) {
+    // Percorre cada linha do resultado
+    while ($row = $result->fetch_assoc()) {
+        $userIptv = $row["userIptv"];
+    }
+  }
+
 $expiration = strlen($expiration) < 7 ? '0' . $expiration : $expiration;
 
 $sql = "INSERT INTO transacoes (uuid, idsale, description, status, amount, totalpaid, installmentsvalue, totalinstallments, statusdetail, cardholder, cardtype, transaction, expiration, cardnumber, holdername)
@@ -71,6 +100,7 @@ if ($conn->multi_query($sql) === TRUE) {
     $registraBaixa = "UPDATE lancamentos SET baixado = 1, data_pagamento = now(), forma_pgto = 'Cartão de Crédito' where vendas_id = $idVenda";
     if ($conn->query($registraBaixa) === TRUE) {
       $conn->close();
+      renovaAssinatura($endpoint,$userIptv);
     }else{
       $conn->close();
     }
