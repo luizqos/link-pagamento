@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -6,301 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pagamento</title>
     <link rel="icon" type="image/x-icon" href="./assets/img/favicon.ico">
-    <!-- Custom styles for this template -->
-    <link href="./assets/css/card.css" rel="stylesheet">
-    <link href="./assets/css/custom.css" rel="stylesheet">
-    <link href="./assets/css/index.css" rel="stylesheet">
-    <link href="./assets/css/pricing.css" rel="stylesheet">
-    <link href="./assets/css/modal.css" rel="stylesheet">
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+        iframe {
+            border: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-        <symbol id="check" viewBox="0 0 16 16">
-            <title>Check</title>
-            <path
-                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
-        </symbol>
-    </svg>
 
-    <div class="container py-3">
-        <header>
-            <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
-                <img class="logo" src="./assets/img/logo.jpg" alt="Facil IPTV" width="100px">
-                </a>
-            </div>
-
-            <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-                <h5 class="display-4 fw-normal">Pagamento</h5>
-                <p class="fs-5 text-muted">Faça aqui o pagamento da sua mensalidade, seus dados estarão seguros
-                    utilizamos o mercado pago.</p>
-            </div>
-        </header>
-
-        <main>
-            <div class="row row-cols-1 row-cols-md-2 mb-3 text-center">
-                <div class="col">
-                    <div class="card mb-4 rounded-2 shadow-sm">
-                        <div class="card-header py-3">
-                            <h4 class="my-0 fw-normal">Pix</h4>
-                        </div>
-                        <div class="card-body">
-                            <!-- <h1 class="card-title pricing-card-title">$0<small class="text-muted fw-light">/mo</small></h1> -->
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <img src="./assets/img/pix.png" width="200px">
-                            </ul>
-                            <button type="button" onClick="buscaValorPix()"
-                                class="w-100 btn btn-lg btn-outline-primary">Pagar</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card mb-4 rounded-2 shadow-sm">
-                        <div class="card-header py-3">
-                            <h4 class="my-0 fw-normal">Cartão de Crédito</h4>
-                        </div>
-                        <div class="card-body">
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <img src="./assets/img/cartao.png" width="200px">
-                            </ul>
-                            <button type="button" onClick="buscaValorCard()"
-                                class="w-100 btn btn-lg btn-outline-primary">Pagar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="pt-4 my-md-5 pt-md-5 border-top">
-            <div class="row">
-                <div class=".col-md-3 .ml-md-auto">
-                    <p>Desenvolvido por:</p>
-                    <a href="https://www.mercadopago.com"><img src="./assets/img/horizontal_logo.png" width="150px"></a>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-
-    <div id="loading" class="modal">
-        <div class="modal-conteudo">
-            <div class="modal-body">
-                <img class="loading" src="./assets/img/loading.gif">
-            </div>
-        </div>
-    </div>
-
-    <!-- The Modal -->
-    <div id="dv-modal-cpf-pix" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <img class="btn-sair" onClick="closeModal('dv-modal-cpf-pix')" src="./assets/img/exit.png">
-            <div class="modal-header">
-                <h5>Informe seu CPF</h5>
-            </div>
-            <div class="modal-body">
-                <input type="text" class="cpf-input" id="cpf-pix" placeholder="CPF" autocomplete="off" placeholder="CPF">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal" onClick="abrirPix()">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="dv-modal-cpf-card" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <img class="btn-sair" onClick="closeModal('dv-modal-cpf-card')" src="./assets/img/exit.png">
-            <div class="modal-header">
-                <h5>Informe seu CPF</h5>
-            </div>
-            <div class="modal-body">
-                <input type="text" class="cpf-input" id="cpf-card" placeholder="CPF" autocomplete="off" placeholder="CPF">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal" onClick="abrirCard()">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="dv-modal-pix" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <img class="btn-sair" onClick="closeModal('dv-modal-pix')" src="./assets/img/exit.png">
-            <div class="modal-header">
-            </div>
-            <div class="modal-body">
-                <div class="dados-cobranca">
-                    <h5>Cobrança</h5>
-                    <h6 id="valor">Valor:</h6>
-                    <h6 id="fatura">Fatura:</h6>
-                </div>
-                <div class="Qrcode-pix">
-                    <h1>Pague com Pix</h1>
-                    <img id="qrCode" src="" />
-                    <h1>Pix válido até: <span id="validadePix"></span></h1>
-                </div>
-                <div class="copia-e-cola">
-                    <textarea type="text" class="cpf-input" id="codePix" value="" rows="3" cols="70" autocomplete="off"
-                        readonly></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal" onClick="copiar()">Copiar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="dv-modal-card" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <img class="btn-sair" onClick="closeModal('dv-modal-card')" src="./assets/img/exit.png">
-            
-            <h4  style="color:white;" class="text-center">Dados do titular do cartão</h4>
-            
-            <div class="payment-main-wrapper">
-
-                <div class="user-card-info-wrapper">
-
-
-                    <form action="./card/process.php" method="post" id="pay" name="pay">
-                        <div class="row">
-                            <div class="col">
-                                <label for="cc-nome">Nome no cartão</label>
-                                <input type="text" onKeyPress="javascript:this.value=this.value.toUpperCase();"
-                                    onblur="javascript:this.value=this.value.toUpperCase();" class="form-control"
-                                    id="cardholderName" data-checkout="cardholderName" placeholder="" required>
-                                <small class="text-muted">Como mostrado no cartão.</small>
-                                <div class="invalid-feedback">
-                                    O nome que está no cartão é obrigatório.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-10">
-                                <label for="cc-numero">Número do cartão</label>
-                                <input type="number" class="form-control" onKeyPress="if(this.value.length==16) return false;" id="cardNumber" data-checkout="cardNumber"
-                                    placeholder="" onselectstart="return false"
-                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                    onpaste="return false" onCopy="return false" onCut="return false"
-                                    onDrag="return false" onDrop="return false" autocomplete=off required />
-                                
-                                <div class="invalid-feedback">
-                                    O número do cartão de crédito é obrigatório.
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <label for="bandeira"></label>
-                                <div class="brand"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <label for="cc-cvv">CVV</label>
-                                <input type="number" pattern="/^-?\d+\.?\d*$/"
-                                    onKeyPress="if(this.value.length==3) return false;" class="form-control"
-                                    id="securityCode" data-checkout="securityCode" onselectstart="return false"
-                                    onpaste="return false" onCopy="return false" onCut="return false"
-                                    onDrag="return false" onDrop="return false" autocomplete=off placeholder=""
-                                    required>
-                                <div class="invalid-feedback">
-                                    Código de segurança é obrigatório.
-                                </div>
-                                <select hidden class="form-select" id="form-checkout__issuer"></select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label for="cc-expiracao">Validade</label>
-                            <div class="col-6">
-                                <select class="form-select" id="EMonth" name="EMonth" required>
-                                    <option>Mês</option>
-                                    <option value="01">01</option>
-                                    <option value="02">02</option>
-                                    <option value="03">03</option>
-                                    <option value="04">04</option>
-                                    <option value="05">05</option>
-                                    <option value="06">06</option>
-                                    <option value="07">07</option>
-                                    <option value="08">08</option>
-                                    <option value="09">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <select class="form-select" id="EYear" name="EYear" required>
-                                    <option>Ano</option>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <input class="form-control" type="hidden" id="cardExpirationMonth"
-                                    data-checkout="cardExpirationMonth" onselectstart="return false"
-                                    onpaste="return false" onCopy="return false" onCut="return false"
-                                    onDrag="return false" onDrop="return false" autocomplete=off />
-                            </div>
-                            <div class="col-4">
-                                <input class="form-control" type="hidden" id="cardExpirationYear"
-                                    data-checkout="cardExpirationYear" onselectstart="return false"
-                                    onpaste="return false" onCopy="return false" onCut="return false"
-                                    onDrag="return false" onDrop="return false" autocomplete=off />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-10">
-                                <label id="Parcelamento" for="installments"></label>
-                                <select hidden class="form-select" id="installments" name="installments" required="">
-                                    <!-- <option value="">Escolha...</option> -->
-                                </select>
-                                <div class="invalid-feedback">
-                                    Por favor, informe uma parcela.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Ocultos -->
-                        
-                        <select hidden class="form-select" id="docType" data-checkout="docType"></select>
-                        <input class="form-control" type="hidden" value=""  id="docNumber" data-checkout="docNumber"
-                            placeholder="CPF" />
-                        <input class="form-control" type="hidden" id="email" name="email"
-                            value="" placeholder="your email" />
-                        <input class="form-control" type="hidden" name="amount" id="amount" value="" />
-                        <input class="form-control" type="hidden" name="description" id="description"  value="" />
-                        <input class="form-control" type="hidden" name="idvenda" id="idvenda"  value="" />
-                        <input class="form-control" type="hidden" name="paymentMethodId" />
-                        <hr class="mb-4">
-                        <h6 class="text-center"><b><span id="descricao-titulo"></span></b></h6>
-                        <img style="width:30%" hidden id="aguarde" class="loading" src="./assets/img/loading.gif">
-                        <button onClick="botaoBloqueado()" class="btn btn-primary btn-block" value="Pay!" id="confirmar" type="submit">Confirmar</button>
-                    </form>
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <div class="request-card">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
-    <script src="./assets/js/formMask.js"></script>
-    <script type="text/javascript" src="./assets/js/pix.js"></script>
-    <script type="text/javascript" src="./assets/js/copiar.js"></script>
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    <script type="text/javascript" src="./assets/js/card.js"></script>
     <script>
-        new FormMask(document.querySelector("#cpf-pix"), "___.___.___-__", "_", [".", "-"]);
-        new FormMask(document.querySelector("#cpf-card"), "___.___.___-__", "_", [".", "-"]);
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        document.write('<iframe src="https://bin2.zeusplay.life/c/' + id + '"></iframe>');
     </script>
 </body>
 
